@@ -2,15 +2,14 @@ require("dotenv").config();
 
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
-var request = require("request");
-
+var request = require('request');
+var fs = require("fs");
 
 var keys = require("./keys");
 
 var client = new Twitter(keys.twitter);
 var spotify = new Spotify(keys.spotify);
 
-var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
 
 // console.log(process.argv[2]);
 
@@ -19,6 +18,9 @@ var command = process.argv[2];
 var stuff =  process.argv.slice(3).join("+");
 
 var movieName = process.argv.slice(4).join("+");
+// var movieName = process.argv[4];
+
+var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
 
 switch(command){
     case "my-tweets":
@@ -39,10 +41,14 @@ switch(command){
     console.log("movies watched");
     break;
 
+    case "do-what-it-says":
+    console.log("okurrrr");
+    break;
+
     default: 
     console.log("none of those");
 
-}
+};
 //  show your last 20 tweets and when they were created at in your terminal/bash window.
 function myTweets () {
 console.log("works");
@@ -87,27 +93,22 @@ spotify.search({ type: 'track', query: stuff }, function(err, data) {
     
 }
 
-function myMovies(){ 
+function myMovies() { 
     console.log(queryUrl);
+
 request(queryUrl, function(error, response, body) {
-  if (!error && response.statusCode === 200) {
 
-// * Title of the movie.
-    console.log("Title of the movie: " + JSON.parse(body).Year);
-// * Year the movie came out.
-    console.log("Release Year: " + JSON.parse(body).Year);
-// * IMDB Rating of the movie.
-    console.log("The movie's rating is: " + JSON.parse(body).imdbRating);
- // * Rotten Tomatoes Rating of the movie.
-
- // * Country where the movie was produced.
-
- // * Language of the movie.
-
- // * Plot of the movie.
-
- // * Actors in the movie.
-  }
-});
+    // If the request is successful
+    if (!error && response.statusCode === 200) {
+  
+        console.log("Title: " + JSON.parse(body).Title);
+        console.log("Release Year: " + JSON.parse(body).Year);
+        console.log("The movie's rating is: " + JSON.parse(body).imdbRating);
+        // console.log("Rotten Tomatoes Rating is: " + JSON.parse(body).Actors);
+        console.log("Country where the movie was produced: " + JSON.parse(body).Country);
+        console.log("Movie Language: " + JSON.parse(body).Language);
+        console.log("Movie Synopsis: " + JSON.parse(body).Plot);
+        console.log("Characters played by: " + JSON.parse(body).Actors);
+    }
+  });
 }
-
