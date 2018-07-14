@@ -2,15 +2,23 @@ require("dotenv").config();
 
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
+var request = require("request");
+
 
 var keys = require("./keys");
 
 var client = new Twitter(keys.twitter);
 var spotify = new Spotify(keys.spotify);
 
+var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
+
 // console.log(process.argv[2]);
 
 var command = process.argv[2];
+
+var stuff =  process.argv.slice(3).join("+");
+
+var movieName = process.argv.slice(4).join("+");
 
 switch(command){
     case "my-tweets":
@@ -22,10 +30,12 @@ switch(command){
     // case "spotify-this-song '<song name here>'":
     // console.log("you played spotify");
     // console.log(process.argv[3]);
-    spotifyThisSong(process.argv[3]);
+    // spotifyThisSong(process.argv[3]);
+    spotifyThisSong();
     break;
 
-    case "OMDB":
+    case "movie-this":
+    myMovies();
     console.log("movies watched");
     break;
 
@@ -51,29 +61,53 @@ for (i = 0; i < tweets.length; i++) {
 });
 }
 
-function spotifyThisSong (arg3) {
+function spotifyThisSong () {
     console.log("No music");
 
-spotify.search({ type: 'track', query: 'All the Small Things' }, function(err, data) {
+spotify.search({ type: 'track', query: stuff }, function(err, data) {
     if (err) {
         return console.log('Error occurred: ' + err);
     }
-    
-    console.log(data); 
+    console.log("****************************")
+    // Artist(s)
+    console.log("The Artist(s) name is: " + data.tracks.items[0].artists[0].name);
+
+    // The song's name
+    console.log("The song's name: " + data.tracks.items[0].name); 
+
+    // The album that the song is from
+    console.log("The album that the song is from: " + data.tracks.items[0].album.name);
+
+    // A preview link of the song from Spotify
+    console.log("A preview link of the song from Spotify: " + data.tracks.items[0].preview_url);
+    // console.log(data.tracks.items[0]); 
+    // console.log("The realease date of this song is: " + data.tracks.items[0].album.release_date); 
+
     });
+    
 }
 
+function myMovies(){ 
+    console.log(queryUrl);
+request(queryUrl, function(error, response, body) {
+  if (!error && response.statusCode === 200) {
 
-// node liri.js spotify-this-song '<song name here>'
+// * Title of the movie.
+    console.log("Title of the movie: " + JSON.parse(body).Year);
+// * Year the movie came out.
+    console.log("Release Year: " + JSON.parse(body).Year);
+// * IMDB Rating of the movie.
+    console.log("The movie's rating is: " + JSON.parse(body).imdbRating);
+ // * Rotten Tomatoes Rating of the movie.
 
-// This will show the following information about the song in your terminal/bash window
+ // * Country where the movie was produced.
 
-// Artist(s)
+ // * Language of the movie.
 
-// The song's name
+ // * Plot of the movie.
 
-// A preview link of the song from Spotify
+ // * Actors in the movie.
+  }
+});
+}
 
-// The album that the song is from
-
-// If no song is provided then your program will default to "The Sign" by Ace of Base.
